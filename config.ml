@@ -10,14 +10,19 @@ let packages = [
   package "tyxml" ;
   package ~min:"3.7.1" "tcpip" ;
   package ~min:"0.2.1" "logs-syslog" ;
+  package "monitoring-experiments"
 ]
 
 let () =
   register "retreat" [
     foreign
-      ~deps:[ abstract logger ; abstract app_info ]
+      ~deps:[ abstract nocrypto ; abstract logger ; abstract app_info ]
       ~packages
       "Unikernel.Main"
-      ( stackv4 @-> job )
+      ( time @-> mclock @-> pclock @-> stackv4 @-> kv_ro @-> job )
+    $ default_time
+    $ default_monotonic_clock
+    $ default_posix_clock
     $ net
+    $ crunch "tls"
   ]
