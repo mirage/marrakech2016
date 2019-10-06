@@ -20,7 +20,12 @@ module Main (S : Mirage_stack_lwt.V4) = struct
     TCP.writev tcp data >>= fun _ ->
     TCP.close tcp
 
-  let start stack =
+  let start stack _ info =
+    Logs.info (fun m -> m "used packages: %a"
+                  Fmt.(Dump.list @@ pair ~sep:(unit ".") string string)
+                  info.Mirage_info.packages) ;
+    Logs.info (fun m -> m "used libraries: %a"
+                  Fmt.(Dump.list string) info.Mirage_info.libraries) ;
     let data =
       let content_size = Cstruct.len Page.rendered in
       [ header content_size ; Page.rendered ]
